@@ -7,8 +7,9 @@
 # robert.marti@udg.edu
 # 
 # (fast2) robert@mariecurie:~/src/elastix$ python reg2volumes.py --non_rigid 0 --fixed_image /mnt/mia_images/wholebody/reg_ACF/ACF_26_221.nii.gz --moving_imag
-# /mnt/mia_images/wholebody/reg_ACF/ACF_26_321.nii.gz --output_image ./affine_ACF_26_321.nii.gz --output_folder res_affine_mask/ --fixed_mask  /mnt/mia_images/w
-# │holebody/reg_ACF/ACF_26_221_labels.nii.gz  --moving_mask  /mnt/mia_images/wholebody/reg_ACF/ACF_26_321_labels.nii.gz
+# /mnt/mia_images/wholebody/reg_ACF/ACF_26_321.nii.gz --output_image ./affine_ACF_26_321.nii.gz --output_folder res_affine_mask/ 
+# --fixed_mask  /mnt/mia_images/wholebody/reg_ACF/ACF_26_221_labels.nii.gz  
+# --moving_mask  /mnt/mia_images/wholebody/reg_ACF/ACF_26_321_labels.nii.gz
 # --------------------------------------------------
 
 import os
