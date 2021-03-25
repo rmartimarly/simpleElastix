@@ -1,7 +1,7 @@
 # --------------------------------------------------
 # Registration of 2 MRI volumes using elastix. 
 #
-#       
+# - Roi version, using the inverse of the mask to register       
 #
 # Robert Marti 2021
 # robert.marti@udg.edu
@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     # Parse input options
     parser = argparse.ArgumentParser(
-        description="Volume registration using elastix")
+        description="Volume registration using elastix- ROI version")
     parser.add_argument('--non_rigid',
                         action='store',
                         required=True,
@@ -65,6 +65,9 @@ if __name__ == "__main__":
     output_fn = opt.output_image
     output_fd = opt.output_folder
 
+    roi_version = True
+    threshold_MRI = 35
+
     if (opt.fixed_mask is not None) and (opt.moving_mask is not None):
         moving_mask_fn = opt.moving_mask
         fixed_mask_fn = opt.fixed_mask
@@ -91,7 +94,27 @@ if __name__ == "__main__":
         moving_msk.SetSpacing(m_sp)
         fixed_msk.SetOrigin(f_org)
         moving_msk.SetOrigin(m_org)
+        # roi_version
+        if roi_version: 
+            # cropping Fixed 
+            labels_stats = sitk.LabelStatisticsImageFilter()
+            labels_stats.Execute(fixed_im, fixed_msk)
+            bbox = label_stats.GetBoundingBox()
+            crop = sitk.CropImageFilter()
+            crop.SetLowerBoundaryCropSize(bbox[0])
+            crop.SetUpperBoundaryCropSize(bbox[1])
+            print(bbox)
+            print(labels_stats.GetLabels()) #(Should print (0,1,2,3))
+            fixed_crop= crop.Execute(fixed_im)
+            sitk.WriteImage(fixed_crop, output_fd+"fixed_cropped.nii.gz")                     
+            fixed_mcrop = crop.Execute(fixed_msk)
+            sitk.WriteImage(fixed_mcrop, output_fd+"fixed_m_cropped.nii.gz")                                 
 
+            # thresholding
+            fixed_th = c_fixed > theshold_MRI
+            
+            # seg = sitk.BinaryDilate(seg, 3) probably not needed. 
+            
 
     print(fixed_im.GetPixelIDTypeAsString())
     fixed_pixelID = fixed_im.GetPixelID()
@@ -159,7 +182,6 @@ if __name__ == "__main__":
     transformixImageFilter.SetTransformParameterMap(elastixImageFilter.GetTransformParameterMap())
     transformixImageFilter.ComputeDeformationFieldOn()
     transformixImageFilter.LogToConsoleOn()
-    transformixImageFilter.ComputeDeformationFieldOn()
     transformixImageFilter.ComputeDeterminantOfSpatialJacobianOn()
     # transformixImageFilter.ComputeSpatialJacobianOn() no need for jacobian (too much space)
     transformixImageFilter.SetOutputDirectory(output_fd)
